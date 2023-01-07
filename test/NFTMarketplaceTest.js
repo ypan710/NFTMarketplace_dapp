@@ -88,5 +88,50 @@ describe("NFT Marketplace", function () {
             expect(newOwnerAddress).to.equal(buyerAddress.address);
         })
 
+        describe("Resale of a marketplace item", async () => {
+            const tokenURI = "https://dummy-token.url/"; // test with a dummy token URI
+            const newNFTToken = await mintAndListNFT(tokenURI, auctionPrice);
+            await nftMarket.connect(buyerAddress).createMarketSale(newNFTToken, {value: auctionPrice});
+            await expect(nftMarket.resellToken(nftMarket, auctionPrice, {value: listingPrice})).to.be.revertedWith("You are not the owner of the token!");
+            await expect(nftMarket.connect(buyerAddress).resellToken(newNFTToken, auctionPrice, {value: 0})).to.be.rejectedWith("The amount sold does not equal the original listing price of the token!");
+
+        })
+
+        describe("Fetch marketplace item", async () => {
+            const tokenURI = "https://dummy-token.url/"; // test with a dummy token URI
+            it("Should fetch the correct number of unsold item", async () => { // we have three items in the marketplace
+                await mintAndListNFT(tokenURI, auctionPrice);
+                await mintAndListNFT(tokenURI, auctionPrice);
+                await mintAndListNFT(tokenURI, auctionPrice);
+
+                let unsoldItems = await nftMarket.fetchMarketItems();
+                expect(unsoldItems.length).to.equal(3);
+            })
+
+            it("Should fetch the correct number of items the user has purchased", async () => {
+                let nftToken = mintAndListNFT(tokenURI, auctionPrice);
+
+                // two NFTs still listed in the marketplace
+                await mintAndListNFT(tokenURI, auctionPrice);
+                await mintAndListNFT(tokenURI, auctionPrice);
+
+                // let itemsPurchased = await nftMarket.fetchNFTs();
+                // expect(itemsPurchased.length).to.equal(3);
+                await nftMarket.connect(buyerAddress).createMarketSale(nftToken, {value: auctionPrice});
+
+                let buyerTotalItems = await nftMarket.connect(buyerAddress).fetchNFTs();
+                expect(buyerTotalItems.length).to.equal(1); // bought only 1 NFT
+            })
+
+            it("Should fetch correct number of items listed by a user", async () => { // two NFTs listed in the marketplace
+                await mintAndListNFT(tokenURI, auctionPrice);
+                await mintAndListNFT(tokenURI, auctionPrice);
+                await nftMarket.connect(buyerAddress).createToken(tokenURI, auctionPrice, {value: listingPrice});
+                let itemListed = await nftMarket.fetchItemsListed();
+                expect(itemListed.length).to.equal(2);
+            })
+        })
+
+
     });
 })
