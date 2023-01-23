@@ -62,7 +62,6 @@ describe("NFT Marketplace", function () {
             const receipt = await transaction.wait();
             const tokenID = receipt.events[0].args.tokenId;
             expect(transaction).to.emit(nftMarket, "MarketItemCreated").withArgs(tokenID, contractOwner.address, nftMarketAddress, auctionPrice, false);
-
         })
     })
 
@@ -130,8 +129,23 @@ describe("NFT Marketplace", function () {
                 let itemListed = await nftMarket.fetchItemsListed();
                 expect(itemListed.length).to.equal(2);
             })
+
         })
 
+        describe("Cancel a marketplace listing", async () => {
+            const tokenURI = "https://dummy-token.url/"; // test with a dummy token URI
+            it("Should cancel and return the correct number of listings", async () => {
+                let nftToken = await mintAndListNFT(tokenURI, auctionPrice);
+                await nftMarket.connect(buyerAddress).createToken(tokenURI, auctionPrice, {value: listingPrice});
+                await nftMarket.connect(buyerAddress).createToken(tokenURI, auctionPrice, {value: listingPrice});
 
+                let unsoldItems = await nftMarket.fetchMarketItems();
+                await expect(unsoldItems.length).to.equal(3);
+                await nftMarket.cancelItemListing(nftToken);
+                unsoldItems = await nftMarket.fetchMarketItems();
+                await expect(unsoldItems.length).to.equal(2);
+                []
+            })
+        })
     });
 })
