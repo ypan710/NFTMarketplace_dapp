@@ -1,13 +1,18 @@
-# Sample Hardhat Project
+# NFT Marketplace Dapp
+This project is used to create a marketplace for users to list, buy, cancel, and resell a NFT.
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## Installation
+Clone the repository by `git clone https://github.com/ypan710/NFTMarketplace_dapp.git`
 
-Try running some of the following tasks:
+## Usage
+1. Open a terminal in Visual Studio Code
+2. Ensure Pinata IPFS keys has been setup via [Pinata Cloud] (https://www.pinata.cloud/)
+2. `cd` to NFTMarketplace_dapp
+3. `cd` to client folder
+4. Run `npm run dev`
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+MIT
